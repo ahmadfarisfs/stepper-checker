@@ -10,8 +10,8 @@ namespace Data{
             MotorEnable =3
         };
         enum MotorDirection_e{
-            Forward,
-            Reverse
+            Forward=0,
+            Reverse=1
         };
       enum MotorState_e{
         Idle,
