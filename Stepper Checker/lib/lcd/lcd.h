@@ -17,9 +17,9 @@ class LCD{
     LCD(U8G2_SSD1306_128X32_UNIVISION_1_HW_I2C *lcd);
     void setup();
     void drawSplashScreen();
-    void drawMainPage( Data::MainParam_t data);
+    void drawMainPage( Data::ScreenMainParam_t data);
     void drawSavedScreen();
     private:
-
+    
     U8G2_SSD1306_128X32_UNIVISION_1_HW_I2C *m_lcd;
 };

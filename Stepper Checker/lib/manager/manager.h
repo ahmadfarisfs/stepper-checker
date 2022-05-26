@@ -7,36 +7,21 @@
 #include "lcd.h"
 
 #define MAX_BUTTON_NUM 5
-class StepperTesterManager{
-        
-    public:
+class StepperTesterManager
+{
 
+public:
+    StepperTesterManager(Button *up, Button *down, Button *plus, Button *minus, Button *enter, Motor *motor, LCD *lcd);
+    void setup();
+    void loop();
 
-        // enum EventType_e {
-        //     OnMoveStartFwd,
-        //     OnMoveStartRev,
-        //     OnMoveStop,
-        // };
-        // enum RunningState_t{
-        //     Idle=0,
-        //     MovingR=1,
-        //     MovingL=2,
-        // };
-
-        StepperTesterManager( Button *up, Button*down,  Button*plus,  Button*minus, Button*enter,Motor * motor, LCD *lcd);
-        void setup();
-        // void onEvent();        
-        // void enableRender();
-        // void disableRender();
-        void loop();
-
-        private:
-        LCD *m_display;
-        Data::MainParam_t m_mainData;
-        Data::SelectedItem_t m_selectedItem;
-        Motor * m_motor;
-        Button* m_up,*m_down,*m_plus,*m_minus,*m_enter;
-        Data::Page_t m_currentPage;
-        Button *m_buttons[MAX_BUTTON_NUM];
-        uint16_t m_movementParam[5];
+private:
+unsigned long m_lastUpdatedScreenTs;
+    void updateItem(Data::ScreenSelectedItem_e selectedID, int8_t changes);
+    LCD *m_display;
+    Data::ScreenSelectedItem_e m_selectedItem;
+    Motor *m_motor;
+    Button *m_up, *m_down, *m_plus, *m_minus, *m_enter;
+    Data::ScreenPage_e m_currentPage;
+    Button *m_buttons[MAX_BUTTON_NUM];
 };

@@ -7,42 +7,63 @@ Motor::Motor(uint8_t enPin, uint8_t stepPin, uint8_t dirPin)
     m_dirPin = dirPin;
 }
 
-void Motor::moveStart(Motor::MovementType_e movType, unsigned long timestamp)
-{
+uint16_t Motor::getCurrentSpeedPps(){
+    return m_currentPps;
+};
+Data::MotorDirection_e Motor::getCurrentDir(){
+    return m_currentDirection;
+};
+Data::MotorMoveParam_e Motor::getMoveParam(){
+    return m_moveParam;
+}
+void Motor::moveStart(Data::MotorDirection_e direction, unsigned long timestamp)
+{   
     // end of accel
-    if (m_currentStatus == Idle ||
-        (m_currentStatus == RampingDown && movType == m_currentMovement))
+    if (m_currentState == Data::MotorState_e::Idle ||
+        (m_currentState == Data::MotorState_e::RampingDown && direction == m_currentDirection))
     {
-        m_currentStatus = RampingUp;
+        m_currentState = Data::MotorState_e::RampingUp;
         m_startMoveTs = timestamp;
-        m_currentMovement = movType;
+        m_currentDirection = direction;
         m_startPps = m_currentPps;
     }
 }
 
 void Motor::moveStop(unsigned long timestamp)
 {
-    if (m_currentStatus != Idle)
+    if (m_currentState != Data::MotorState_e::Idle)
     {
         m_stopMoveTs = timestamp;
-        m_currentStatus = RampingDown;
+        m_currentState = Data::MotorState_e::RampingDown;
         m_startPps = m_currentPps;
     }
+}
+bool Motor::isArmed()
+{
+ return   m_enabled;
 }
 void Motor::setArmed(bool state)
 {
     m_enabled = state;
 }
-void Motor::setMoveParam(uint16_t rampUpMs, uint16_t speedPps, uint16_t rampDownMs)
-{
-    m_speedPps = speedPps;
 
-    m_accelPpsPerMs = float(m_speedPps) / float(rampUpMs);
-    m_deccelPpsPerMs = float(m_speedPps) / float(rampDownMs);
-}
-Motor::MovementStatus_e Motor::getStatus()
+// Data::MotorMoveParam_e Motor::getMoveParam(){
+//     return m_moveParam;
+// }
+
+void Motor::setMoveParam(Data::MotorMoveParam_e param)
 {
-    return m_currentStatus;
+    m_moveParam = param;
+    // m_moveParam.speedPps = speedPps;
+    // m_moveParam.rampUpMs = rampUpMs;
+    // m_moveParam.rampDownMs = rampDownMs;
+
+    m_accelPpsPerMs = float(m_moveParam.speedPps) / float(m_moveParam.rampUpMs);
+    m_deccelPpsPerMs = float(m_moveParam.speedPps) / float(m_moveParam.rampDownMs);
+}
+Data::MotorState_e Motor::getState()
+{
+    return m_currentState;
 }
 void Motor::setup(){
     pinMode(m_EnPin, OUTPUT);
@@ -51,19 +72,20 @@ void Motor::setup(){
     digitalWrite(m_EnPin,LOW);
     digitalWrite(m_dirPin,LOW);
     digitalWrite(m_StepPin,LOW);
-    m_currentStatus=Idle;
+    m_currentState=Data::MotorState_e::Idle;
+    setArmed(true);
     
 }
 void Motor::loop(unsigned long currentMicros)
 {
 
-    if (m_currentStatus == RampingUp)
+    if (m_currentState == Data::MotorState_e::RampingUp)
     {
         // calculate current speed
         m_currentPps = m_startPps + uint16_t(m_accelPpsPerMs * (currentMicros / 1000 - m_startMoveTs/1000));
         m_stepInterValMicros = (1000000.0 / m_currentPps);
     }
-    else if (m_currentStatus == RampingDown)
+    else if (m_currentState == Data::MotorState_e::RampingDown)
     {
         int16_t currentPps = m_startPps - uint16_t(m_deccelPpsPerMs * (currentMicros / 1000 - m_stopMoveTs/1000));
         
@@ -80,26 +102,26 @@ void Motor::loop(unsigned long currentMicros)
         // do not change speed
     }
 
-    if (m_currentPps >= m_speedPps && m_currentStatus == RampingUp)
+    if (m_currentPps >= m_moveParam.speedPps && m_currentState == Data::MotorState_e::RampingUp)
     {
-        m_currentStatus = ConstantSpeed;
+        m_currentState = Data::MotorState_e::ConstantSpeed;
     }
 
-    if (m_currentPps == 0 && m_currentStatus == RampingDown)
+    if (m_currentPps == 0 && m_currentState == Data::MotorState_e::RampingDown)
     {
-        m_currentStatus = Idle;
+        m_currentState = Data::MotorState_e::Idle;
         m_currentPps = 0;
     }
 
     digitalWrite(m_EnPin, m_enabled);
-    digitalWrite(m_dirPin, uint8_t(m_currentMovement));
+    digitalWrite(m_dirPin, uint8_t(m_currentDirection));
     // if(m_currentType==Forward){
     // Serial.println(int16_t(m_currentPps));
 
     // }else{
     //         Serial.println(-(int16_t)m_currentPps);
     // }
-    if (currentMicros > m_lastStepTsMicros + m_stepInterValMicros && m_currentStatus != Idle)
+    if (currentMicros > m_lastStepTsMicros + m_stepInterValMicros && m_currentState != Data::MotorState_e::Idle)
     {
         digitalWrite(m_StepPin, HIGH);
         delayMicroseconds(2); // minimum pulse width
