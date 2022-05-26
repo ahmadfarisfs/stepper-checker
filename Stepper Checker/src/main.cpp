@@ -22,7 +22,7 @@ StepperTesterManager manager(&moveR,&moveL,&speedDown,&speedUp,&enter,&motor,&di
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("=BEGIN=");
   pinMode(STATUS_LED_PIN, OUTPUT); // status led
   pinMode(BZR_PIN, OUTPUT); // speaker
