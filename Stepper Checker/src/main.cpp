@@ -6,35 +6,14 @@
 #include "btn.h"
 #include "motor.h"
 #include "nonstd.h"
-
+#include "manager.h"
+#include "lcd.h"
 //  u8g2(U8G2_R0, U8X8_PIN_NONE);
-// #define LCDWidth                        u8g2.getDisplayWidth()
-// #define ALIGN_CENTER(t)                 ((LCDWidth - (u8g2.getStrWidth(t))) / 2)
-// #define ALIGN_RIGHT(t)                  (LCDWidth -  u8g2.getStrWidth(t))
-// #define ALIGN_LEFT                      0
+
 uint8_t currentPage = 0;
 const uint8_t pageCount = 2;
-const char str0[] PROGMEM = "ASEP";
-const char str1[] PROGMEM = "Awesome Stepper";
-const char str2[] PROGMEM = "Enabler Project v1.0";
 
-uint32_t pulsePerSecond = 100;
 
-void drawSplashScreen()
-{
-  // awesome splash screen!
-  // u8g2.setFont(u8g2_font_tenstamps_mf);//12 pixel
-  // u8g2.drawStr(ALIGN_CENTER(str0),12,str0);
-  // u8g2.setFont(u8g2_font_5x7_tr);//6 pixel
-  // u8g2.drawStr(ALIGN_CENTER(str1),23,str1);
-  // u8g2.drawStr(ALIGN_CENTER(str2),31,str2);
-}
-
-void drawMainScreen()
-{
-}
-
-void (*pages[pageCount])() = {drawSplashScreen, drawMainScreen};
 
 Button moveR(BTN_MOVE_R_PIN, true);
 Button moveL(BTN_MOVE_L_PIN, true);
@@ -42,49 +21,25 @@ Button speedUp(BTN_SPEED_UP_PIN, true);
 Button speedDown(BTN_SPEED_DOWN_PIN, true);
 Button enter(BTN_EN_PIN, true);
 Motor motor(EN_PIN, STEP_PIN, DIR_PIN);
+U8G2_SSD1306_128X32_UNIVISION_1_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
 
+LCD display(&u8g2);
+StepperTesterManager manager(&moveR,&moveL,&speedDown,&speedUp,&enter,&motor,&display);
 void setup()
 {
-  for (uint8_t i = 0; i < 5; i++)
-  {
-    buttons[i]->setup(1000, 100, 50);
-  }
-
-
-
+ Serial.begin(9600);
+  Serial.println("=BEGIN");
   pinMode(STATUS_LED_PIN, OUTPUT); // status led
-  pinMode(EN_PIN, OUTPUT);   // en konektor top
-  pinMode(STEP_PIN, OUTPUT); // step, middle connector
-  pinMode(DIR_PIN, OUTPUT);  // dir. bottom connector
-
   pinMode(BZR_PIN, OUTPUT); // speaker
-  Serial.begin(9600);
-  Serial.println("BEGIN");
+  manager.setup();
+  Serial.println("8BEGI4");
+ 
 }
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
-  // Serial.print(digitalRead(2));
-  // Serial.print(digitalRead(3));
-  // Serial.print(digitalRead(4));
-  // Serial.print(digitalRead(5));
-  // Serial.println(digitalRead(6));
-  // digitalWrite(8,HIGH);
-  // delay(1000);
-
-  // digitalWrite(8,LOW);
-  // delay(1000);
-
-  // drawing loop
-  //  u8g2.firstPage();
-  //  do{
-  //    (*pages[currentPage])();
-  //  }while (u8g2.nextPage());
-  for (uint8_t i = 0; i < 5; i++)
-  {
-    buttons[i]->loop();
-  }
+  // display.drawSplashScreen();
+  manager.loop();
 }
 
 // /*

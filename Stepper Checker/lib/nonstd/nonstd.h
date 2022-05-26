@@ -1,7 +1,9 @@
 #pragma once
 #ifdef __AVR__
 #include <Arduino.h>
+// #ifndef __INTELLISENSE__
 extern void * operator new(size_t size, void * ptr);
+// #endif
 namespace nonstd{
   
   template<class T>struct tag{using type=T;};
