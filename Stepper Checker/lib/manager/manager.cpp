@@ -40,7 +40,7 @@ void StepperTesterManager::setup()
                       {
 
                           if(m_currentPage == Data::ScreenPage_e::MainScreen){
-                              m_buzzer->buzz(500);
+                            m_buzzer->buzz(500);
     
                             m_motor->moveStart(Data::MotorDirection_e::Forward, micros());
                           }else{

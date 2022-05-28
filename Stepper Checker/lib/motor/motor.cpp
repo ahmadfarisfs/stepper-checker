@@ -54,10 +54,6 @@ void Motor::setArmed(bool state)
 void Motor::setMoveParam(Data::MotorMoveParam_e param)
 {
     m_moveParam = param;
-    // m_moveParam.speedPps = speedPps;
-    // m_moveParam.rampUpMs = rampUpMs;
-    // m_moveParam.rampDownMs = rampDownMs;
-
     m_accelPpsPerMs = float(m_moveParam.speedPps) / float(m_moveParam.rampUpMs);
     m_deccelPpsPerMs = float(m_moveParam.speedPps) / float(m_moveParam.rampDownMs);
 }
