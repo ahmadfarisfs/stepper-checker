@@ -13,7 +13,7 @@ void Blinky::setDuration(uint16_t durationMs){
 }
 
 void Blinky::loop(){
-    unsigned long currentMillis;
+    unsigned long currentMillis=millis();
     if(currentMillis > m_lastChangeState + m_dur){
         digitalWrite(m_pin,!digitalRead(m_pin));
         m_lastChangeState = currentMillis;
