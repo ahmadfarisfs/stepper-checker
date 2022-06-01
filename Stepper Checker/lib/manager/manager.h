@@ -11,9 +11,16 @@ class StepperTesterManager
 {
 
 public:
-    StepperTesterManager(Button *up, Button *down, Button *plus, Button *minus, Button *enter, IMotor *motor, LCD *lcd, Buzzer * bzr);
-    void setup();
+    StepperTesterManager(Button *up, Button *down, Button *plus, Button *minus, Button *enter, IMotor *motor, LCD *lcd, Buzzer *bzr);
+    void setup(void (*onStartLeft)(void),void (*onStopMotor)(void),void (*onStartRight)(void),
+void (*onPlusOne)(void),void (*onPlusTen)(void),void (*onMinusOne)(void),void (*onMinusTen)(void),void (*onEnter)(void),
+void (*onSave)(void));
     void loop();
+    void onStartMotor(Data::MotorDirection_e dir);
+    void onStopMotor();
+    void onChangeVars(int8_t delta);
+    void onEnter();
+    void onSave();
 
 private:
 unsigned long m_lastUpdatedScreenTs;

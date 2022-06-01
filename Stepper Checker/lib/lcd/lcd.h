@@ -1,10 +1,13 @@
 #pragma once
 // #include "manager.h"
+#include "SSD1306Ascii.h"
+#include "SSD1306AsciiWire.h"
 #include "data.h"
-#include <U8g2lib.h>
-#define LCDWidth                        m_lcd->getDisplayWidth()
-#define ALIGN_CENTER(t)                 ((LCDWidth - (m_lcd->getStrWidth(t))) / 2)
-#define ALIGN_RIGHT(t)                  (LCDWidth -  m_lcd->getStrWidth(t))
+#define I2C_ADDRESS 0x3C
+// #include <U8g2lib.h>
+#define LCDWidth                        128
+#define ALIGN_CENTER(t)                 ((LCDWidth - (m_lcd->strWidth(t))) / 2)
+#define ALIGN_RIGHT(t)                  (LCDWidth -  m_lcd->strWidth(t))
 #define ALIGN_LEFT                      0
 const char str0[]  = "ASEP";
 const char str1[]  = "Awesome Stepper";
@@ -14,12 +17,14 @@ class LCD{
 
     public:
     
-    LCD(U8G2_SSD1306_128X32_UNIVISION_1_HW_I2C *lcd);
+    LCD(SSD1306AsciiWire *lcd);
     void setup();
     void drawSplashScreen();
     void drawMainPage( Data::ScreenMainParam_t data);
     void drawSavedScreen();
     private:
-    
-    U8G2_SSD1306_128X32_UNIVISION_1_HW_I2C *m_lcd;
+    bool m_isDrawn;
+    Data::ScreenPage_e m_currentScreen;
+    Data::ScreenMainParam_t m_prevData;
+    SSD1306AsciiWire *m_lcd;
 };

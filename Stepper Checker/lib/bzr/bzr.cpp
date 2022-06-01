@@ -14,7 +14,7 @@ void Buzzer::buzz(uint16_t duration){
     {
         return;
     }
-    digitalWrite(m_pin, HIGH);
+    // digitalWrite(m_pin, HIGH);
     m_buzzerEndTime = millis() + duration;
 }
 

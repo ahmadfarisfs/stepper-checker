@@ -11,42 +11,46 @@ EnhancedMotor::EnhancedMotor(uint8_t enPin, uint8_t stepPin, uint8_t dirPin,Fast
 };
 Data::MotorState_e EnhancedMotor::getState()
 {
-    if (!m_stepper->isMotorRunning())
+    if (!m_stepper->isRunning())
     {
         return Data::MotorState_e::Idle;
     }
+
     int32_t state = m_stepper->getCurrentAcceleration();
 
     if (state > 0)
     {
         return Data::MotorState_e::RampingUp;
     }
-    else
+    else if (state <0)
     {
         return Data::MotorState_e::RampingDown;
+    }else{
+        return Data::MotorState_e::ConstantSpeed;
     }
 
-    return Data::MotorState_e::Idle;
 };
 Data::MotorDirection_e EnhancedMotor::getCurrentDir(){
-
+    return m_currentDir;
 };
-uint16_t EnhancedMotor::getCurrentSpeedPps(){};
-void EnhancedMotor::moveStart(Data::MotorDirection_e dir, unsigned long timestamp)
+uint16_t EnhancedMotor::getCurrentSpeedPps(){
+    return uint16_t(abs(float(m_stepper->getCurrentSpeedInMilliHz())/1000.0));
+};
+void EnhancedMotor::moveStart(Data::MotorDirection_e dir)
 {
+    
     m_stepper->setAcceleration(m_accel);
     if (dir == Data::MotorDirection_e::Forward)
-    {
-
+    {m_currentDir = Data::MotorDirection_e::Forward;
         m_stepper->runForward();
     }
     else
     {
-
+        m_currentDir = Data::MotorDirection_e::Reverse;
         m_stepper->runBackward();
     }
 };
-void EnhancedMotor::moveStop(unsigned long timestamp)
+void EnhancedMotor::moveStop()
 {
     m_stepper->setAcceleration(m_deccel);
     m_stepper->stopMove();
@@ -61,12 +65,13 @@ void EnhancedMotor::setArmed(bool state)
     {
         m_stepper->disableOutputs();
     }
+    m_isEnabled = state;
 };
 bool EnhancedMotor::isArmed()
 {
-    return m_stepper->getEnablePinHighActive();
+    return m_isEnabled;
 };
-void EnhancedMotor::loop(unsigned long currentTs){};
+void EnhancedMotor::loop(){};
 void EnhancedMotor::setup()
 {
     m_engine->init();
@@ -76,6 +81,8 @@ void EnhancedMotor::setup()
         m_stepper->setDirectionPin(m_dirPin);
         m_stepper->setEnablePin(m_EnPin);
         m_stepper->setAutoEnable(false);
+        m_stepper->enableOutputs();
+        m_isEnabled = true; // enable state must be shadowed
     }
 };
 void EnhancedMotor::setMoveParam(Data::MotorMoveParam_e param)

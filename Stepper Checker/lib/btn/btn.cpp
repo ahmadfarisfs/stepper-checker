@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <btn.h>
 // #include <ArduinoSTL.h>
-#include <nonstd.h>
+// #include <nonstd.h>
 
 Button::Button(uint8_t pin, bool invert)
 {
@@ -19,7 +19,7 @@ void Button::setup(uint16_t longPressMs, uint16_t longPressIntervalMs, uint16_t 
     m_debounceTimeMs = debounceTimeMs;
 }
 
-void Button::setCallback(EventType_e evt, nonstd::function<void(void)> cb)
+void Button::setCallback(EventType_e evt, void (*cb)(void))
 {
     switch (evt)
     {
@@ -63,7 +63,7 @@ void Button::loop()
     {
         // down event
         m_lanonstdownTs = millis();
-        if (m_onDown)
+        if (m_onDown!=nullptr)
         {
             m_onDown();
         }
@@ -74,7 +74,7 @@ void Button::loop()
         m_lastUpTs = millis();
         m_lpTriggred = false;
         m_lpTrigCount = 0;
-        if (m_onUp)
+        if (m_onUp!=nullptr)
         {
             m_onUp();
         }
@@ -88,7 +88,7 @@ void Button::loop()
         if (currentMs > m_lanonstdownTs + m_longPressMs && !m_lpTriggred)
         {
             m_lpTriggred = true;
-            if (m_onLP)
+            if (m_onLP!=nullptr)
             {
                 m_onLP();
             }
@@ -99,7 +99,7 @@ void Button::loop()
         if (m_lpTriggred && (uint16_t)(durAfterLP / m_lpIntMs) > m_lpTrigCount)
         {
             m_lpTrigCount++;
-            if (m_onLPInt)
+            if (m_onLPInt!=nullptr)
             {
                 m_onLPInt();
             }

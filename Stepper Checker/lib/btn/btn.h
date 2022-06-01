@@ -1,6 +1,6 @@
 #pragma once
 #include "Arduino.h"
-#include <nonstd.h>
+
 class Button
 {
 public:
@@ -13,7 +13,7 @@ public:
     };
     Button(uint8_t pin, bool invert = false);
     void setup(uint16_t longPressMs, uint16_t longPressIntervalMs, uint16_t debounceTimeMs);
-    void setCallback(EventType_e evt, nonstd::function<void(void)> cb);
+    void setCallback(EventType_e evt, void (*cb)(void));
     bool isPressed();
     void loop();
 
@@ -25,8 +25,8 @@ private:
     bool m_invert;
     bool m_lastIsPressed;
     uint16_t m_longPressMs, m_lpIntMs;
-    nonstd::function<void(void)> m_onDown;
-    nonstd::function<void(void)> m_onUp;
-    nonstd::function<void(void)> m_onLP;
-    nonstd::function<void(void)> m_onLPInt;
+    void (*m_onDown)(void) ;
+    void (*m_onUp)(void);
+    void (*m_onLP)(void);
+    void (*m_onLPInt)(void);
 };
