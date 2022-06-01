@@ -8,8 +8,8 @@
 
 #define STATUS_LED_PIN 13
 
-#define STEP_PIN 11
-#define EN_PIN 10
+#define STEP_PIN 10
+#define EN_PIN 11
 #define DIR_PIN 12
 
 #define BZR_PIN 8

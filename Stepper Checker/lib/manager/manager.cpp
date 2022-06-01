@@ -3,7 +3,7 @@
 #include "motor.h"
 #include "lcd.h"
 #include <EEPROM.h>
-StepperTesterManager::StepperTesterManager(Button *up, Button *down, Button *plus, Button *minus, Button *enter, Motor *motor, LCD *lcd,Buzzer * bzr)
+StepperTesterManager::StepperTesterManager(Button *up, Button *down, Button *plus, Button *minus, Button *enter, IMotor *motor, LCD *lcd,Buzzer * bzr)
 {
     m_display = lcd;
     m_up = up;
